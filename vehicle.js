@@ -70,7 +70,7 @@ function Vehicle(x, y, col) {
 				this.getPosition(this.angle, this.speed * ratio)
 			);
 			var pos2 = this.position.copy();
-			var Offroad = this.detectOffroad(pos2, pos1);
+			var Offroad = this.detectOffroad(pos2, pos1, false);
 			if(Offroad){
 				this.position.x = round(Offroad.x/ratio)*ratio;
 				this.position.y = round(Offroad.y/ratio)*ratio;
@@ -82,21 +82,22 @@ function Vehicle(x, y, col) {
 		}
 	}
 	
-	this.detectOffroad = function(pos2, pos1){
-		var vect = createVector(pos2.x - pos1.x, pos2.y - pos1.y);
-		var length = vect.mag();
-		var color;
-		for(var n = 5; n < length; n++){
-			vect.normalize();
-			vect.mult(n);
-			color = get(pos1.x + round(vect.x), pos1.y + round(vect.y));
-			if(color[0] == color[1] && color[1] == color[2]){
+	this.detectOffroad = function(pos2, pos1, debug){
+		var xx = pos2.x - pos1.x;
+		var yy = pos2.y - pos1.y;
+		var xOffset = xx ? (xx) / Math.abs(xx) : 0;
+		var yOffset = yy ? (yy) / Math.abs(yy) : 0;
+		var vlength = xx ? Math.abs(xx) : Math.abs(yy);
+		
+		for(var l = 5; l <= vlength; l++){
+			idx = 4 * ( (pos1.y + l*yOffset) * width + pos1.x + l*xOffset );
+			if(debug) console.log(pixels[idx], pixels[idx+1], pixels[idx+2]);
+			if(pixels[idx] == pixels[idx+1] && pixels[idx+1] == pixels[idx+2]){
 				//on track!
 			}else{
-				return {'x':pos1.x + round(vect.x),'y':pos1.y + round(vect.y)};
+				return {'x':pos1.x + l*xOffset,'y':pos1.y + l*yOffset};
 			}
 		}
-		return false;
 	}
 	
 	this.detectWin = function(pos){
@@ -145,9 +146,10 @@ function Vehicle(x, y, col) {
 		}
 		
 		var possMoves = this.getAllMoves(position, angle, speed, 0);
+		
 		for(var i = 0; i < possMoves.length; i++){
 			col = get(possMoves[i].pos.x, possMoves[i].pos.y);
-			offroad = this.detectOffroad(possMoves[i].pos, position);
+			offroad = this.detectOffroad(possMoves[i].pos, position, false);
 			if(col[0] == col[1] && col[1] == col[2] && ! offroad){
 				scores.push(this.findBestMove(possMoves[i].pos, possMoves[i].angle, possMoves[i].speed, depth-1));
 			}else{
@@ -183,7 +185,7 @@ function Vehicle(x, y, col) {
 					newPosition = position.copy().add(
 						this.getPosition(newAngle, newSpeed * ratio)
 					);
-					if(newPosition.x >= 0 && newPosition.y >= 0 && newPosition.x <= width && newPosition.y <= height){
+					if(newPosition.x > 0 && newPosition.y > 0 && newPosition.x < width && newPosition.y < height){
 						allMoves.push({pos:newPosition,dir:d,vel:v,angle:newAngle,speed:newSpeed});
 					}
 				}

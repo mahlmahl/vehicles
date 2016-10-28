@@ -6,16 +6,18 @@ var maxVelocity = 6;
 var angleInterval = 45;
 var track;
 var race;
+var PD;
 
 function setup() {
 	track = [];
 	race = false;
+	PD = pixelDensity();
 	
 	createCanvas(floor(900/ratio) * ratio, floor(600/ratio) * ratio);
 	grid = new Grid(ratio);
 	
-	var me = color(255, 200);
-	var ai = color(155, 200);
+	var me = color(255, 0, 0, 170);
+	var ai = color(0, 155, 0, 170);
 	car1 = new Vehicle(1, 2, me);
 	car2 = new Vehicle(1, 3, ai);
 	
@@ -54,6 +56,7 @@ function mouseDragged(){
 
 function mouseReleased(){
 	race = true;
+	if( ! pixels.length) loadPixels();
 }
 
 function draw() {
@@ -81,6 +84,8 @@ function draw() {
 	
 	car1.moves(car1.position, car1.angle, car1.speed);
 	//car2.moves(car2.position, car2.angle, car2.speed);
+	//car1.AIgo(DEPTH);
+	//car2.AIgo(DEPTH);
 	car1.show(true);
 	car2.show(false);
 }
