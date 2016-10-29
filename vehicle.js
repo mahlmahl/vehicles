@@ -136,7 +136,7 @@ function Vehicle(x, y, col) {
 		var scores = [];
 		var moves = [];
 		var col, offroad, result;
-		var max = 0;
+		var max = -100;
 		var bestJ = -1;
 		
 		if(this.detectWin(position)) return 10;
@@ -153,7 +153,7 @@ function Vehicle(x, y, col) {
 			if(col[0] == col[1] && col[1] == col[2] && ! offroad){
 				scores.push(this.findBestMove(possMoves[i].pos, possMoves[i].angle, possMoves[i].speed, depth-1));
 			}else{
-				scores.push(-this.findBestMove(possMoves[i].pos, possMoves[i].angle, possMoves[i].speed, depth-1));
+				scores.push(-10);
 			}
 			moves.push(possMoves[i]);
 		}
